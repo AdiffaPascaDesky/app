@@ -1,0 +1,1 @@
+<img src="{{url('asset/Logo-Bank-Sumut.png')}}" alt="" class=" w-[150px] h-[70px]">

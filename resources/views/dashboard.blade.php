@@ -9,9 +9,100 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{ __("You're logged in!") }}
+                    <div class="grid grid-cols-3 gap-6">
+                        <div class="p-4 bg-gray-100 rounded-xl">
+                            <p class="text-center font-semibold">Survey Penilaian Pelayanan Customer Service</p>
+                            <canvas id="piechart"></canvas>
+                        </div>
+                        <div class=" col-span-2 p-4 bg-gray-100 rounded-xl">
+                            <p class="text-center font-semibold">Survey Penilaian Kecepatan Transaksi Customer Service
+                            </p>
+                            <canvas id="kecepatan"></canvas>
+                        </div>
+                        <div class=" col-span-2 p-4 bg-gray-100 rounded-xl">
+                            <p class="text-center font-semibold">Survey Penilaian Penjelasan yang Diberikan Customer Service
+                            </p>
+                            <canvas id="penjelasan"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const pelayanancs = document.getElementById('piechart');
+        new Chart(pelayanancs, {
+            type: 'doughnut',
+            data: {
+                labels: ['Tidak Ramah', 'Kurang Ramah', 'Ramah', 'Sangat Ramah'],
+                datasets: [{
+                    labels: 'Bagaiman Pendapat Saudara/i Tentang Pelayanan Yang Diberikan CS: ',
+                    data: [{{ $tidakramah }}, {{ $kurangramah }}, {{ $ramah }},
+                        {{ $sangatramah }}
+                    ],
+                    hoverOffset: 4
+                }]
+            }
+        })
+        const kecepatancs = document.getElementById('kecepatan');
+        new Chart(kecepatancs, {
+            type: 'bar',
+            data: {
+                labels: ['2022', '2023', '2024'],
+                datasets: [
+
+                    {
+                        label: 'Sangat Lambat',
+                        data: [{{ $kecepatantransaksi[0]['jumlah'] }}, {{ $kecepatantransaksi[3]['jumlah'] }},
+                            {{ $kecepatantransaksi[6]['jumlah'] }}
+                        ],
+                    }, {
+                        label: 'Lambat',
+                        data: [{{ $kecepatantransaksi[1]['jumlah'] }}, {{ $kecepatantransaksi[4]['jumlah'] }},
+                            {{ $kecepatantransaksi[7]['jumlah'] }}
+                        ],
+                    }, {
+                        label: 'Cepat',
+                        data: [{{ $kecepatantransaksi[2]['jumlah'] }}, {{ $kecepatantransaksi[5]['jumlah'] }},
+                            {{ $kecepatantransaksi[8]['jumlah'] }}
+                        ],
+                    }
+                ]
+            }
+        })
+        const penjelasan = document.getElementById('penjelasan');
+        new Chart(penjelasan,{
+            type: 'bar',
+            data: {
+                labels: ['Jelas', 'Jelas Tetapi Kurang Tepat','Kurang Jelas', 'Tidak Jelas'],
+                datasets: [{
+                    label: 'Jumlah',
+                    data: [{{$jelas}},{{$jelastidaktepat}},{{$kurangjelas}},{{$tidakjelas}}],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+              x      ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y', // mengatur axis menjadi horizontal
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        })
+    </script>
 </x-app-layout>

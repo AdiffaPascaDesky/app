@@ -12,7 +12,12 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 space-y-6 text-gray-900 dark:text-gray-100">
                     <div class="flex justify-between">
-                        <div class=""></div>
+                        <button data-modal-target="default-modal" data-modal-toggle="default-modal"
+                            class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            type="button">
+                            Filter
+                        </button>
+
                         <div class=""><a href="{{ url('penilaian-cs/create') }}" type="button"
                                 class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Tambah</a>
                         </div>
@@ -22,120 +27,118 @@
                             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                 <thead
                                     class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    {{-- @foreach ($penilaian as $row) --}}
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Nama Unit Kantor Bank Sumut
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Nama Nasabah
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Nomor Handphone Nasabah
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Bagaimana pendapat saudara/i tentang pelayanan yang diberikan Customer
-                                            Service
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Bagaimana pendapat saudara/i tentang kecepatan transaksi Customer Service
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Bagaimana pendapat saudara/i tentang penjelasan yang diberikan Customer
-                                            Service tentang kebutuhan transaksi saudara/i
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Sebutkan Nama Customer Service yang dinilai
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Bagaimana pendapat saudara/i tentang kebersihan dan kenyamanan Bank Sumut
-                                            tempat saudara bertransaksi.
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Bagaimana pendapat saudara/i tentang pelayanan yang diberikan satpam dalam
-                                            mengarahkan anda untuk bertransaksi ke Customer Service
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Sebutkan nama satpam yang dinilai
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Apakah dalam bertransaksi di Bank Sumut ini saudara/i ada diminta uang
-                                            imbalan atas pelayanan yang saudara/i dapatkan.
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Sebutkan nama pegawai Bank Sumut (Jika minta uang imbalan atas pelayanan
-                                            yang saudara/i dapatkan)
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Saran untuk perbaikan layanan Bank Sumut
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Email Address
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                            Tanggal
-                                        </th>
+                                        <!-- Show only selected display columns -->
+                                        @foreach ($displayColumns as $column)
+                                            @if (request()->has('display_columns') && in_array($column, request('display_columns')))
+                                                <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
+                                                    {{ ucwords(str_replace('_', ' ', $column)) }}
+                                                </th>
+                                            @endif
+                                        @endforeach
+                                        @foreach ($filterColumns as $column)
+                                            @if (request()->has('display_columns') && in_array($column, request('display_columns')))
+                                                <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
+                                                    {{ ucwords(str_replace('_', ' ', $column)) }}
+                                                </th>
+                                            @endif
+                                        @endforeach
                                     </tr>
+                                    {{-- @endforeach  --}}
                                 </thead>
                                 <tbody>
 
-                                    @foreach ($penilaians as $data)
-                                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                            <th scope="row"
-                                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                {{ $data->nama_unit }}
-                                            </th>
-                                            <td class="px-6 py-4">
-                                                {{ $data->nama_nasabah }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->nomor_handphone }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->pendapat_tentang_pelayanan_yang_diberikan }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->pendapat_tentang_kecepatan_transaksi }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->pendapat_tentang_penjelasan_yang_diberikan }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->nama_cs }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->pendapat_tentang_kebersihan }}
-                                            </td> 
-                                            <td class="px-6 py-4">
-                                                {{ $data->pendapat_tentang_pelayanan_satpam }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->nama_satpam }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->diminta_uang_imbalan }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->nama_pegawai_meminta_imbalan }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->saran_perbaikan }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $data->email }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ Carbon::parse($data->created_at)->translatedFormat('d F Y') }}
-                                            </td>
+                                    @foreach ($penilaian as $row)
+                                        <tr>
+                                            <!-- Show only selected display columns -->
+                                            @foreach ($displayColumns as $column)
+                                                @if (request()->has('display_columns') && in_array($column, request('display_columns')))
+                                                    <td class=" px-4 py-2">{{ $row->$column }}</td>
+                                                @endif
+                                            @endforeach
+                                            @foreach ($filterColumns as $column)
+                                                @if (request()->has('display_columns') && in_array($column, request('display_columns')))
+                                                    <td class=" px-4 py-2">{{ $row->$column }}</td>
+                                                @endif
+                                            @endforeach
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                             <div class="flex justify-center items-center">
-                                {{$penilaians->links()}}
+                                {{ $penilaian->links() }}
                             </div>
                         </div>
 
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="default-modal" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-7xl max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+
+                    <button type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-hide="default-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <div class="p-4 md:p-5 space-y-4">
+                    <form method="GET" action="{{ url('penilaian-cs') }}">
+                        <div class="flex flex-wrap">
+                            <!-- Display-only Columns -->
+                            <div class="m-2 w-full">
+                                <h3 class="font-bold">Display Columns</h3>
+                                <div class="space-y-2">
+                                    @foreach ($displayColumns as $column)
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" name="display_columns[]" value="{{ $column }}"
+                                                {{ request()->has('display_columns') && in_array($column, request('display_columns')) ? 'checked' : '' }}
+                                                class="text-blue-500 form-checkbox h-4 w-4 rounded border-gray-300 focus:ring focus:ring-blue-200">
+                                            <span>{{ ucwords(str_replace('_', ' ', $column)) }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- Value Filter Columns -->
+                            @foreach ($distinctValues as $column => $values)
+                                <div class="m-2 w-full">
+                                    <h3 class="font-bold">{{ ucwords(str_replace('_', ' ', $column)) }}</h3>
+                                    <div class="space-y-2">
+                                        @foreach ($values as $value)
+                                            <label class="flex items-center space-x-2">
+                                                <input type="checkbox" name="{{ $column }}[]"
+                                                    value="{{ $value }}"
+                                                    {{ request()->has($column) && in_array($value, request($column)) ? 'checked' : '' }}
+                                                    class="text-blue-500 form-checkbox h-4 w-4 rounded border-gray-300 focus:ring focus:ring-blue-200">
+                                                <span>{{ $value }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="mt-4 flex justify-end space-x-2">
+                            <button type="button" onclick="toggleModal(false)"
+                                class="bg-gray-400 text-white py-2 px-4 rounded">Close</button>
+                            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Apply
+                                Filter</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -61,7 +61,17 @@ class DashboardController extends Controller
             }
         }
         $kecepatantransaksi = collect($result)->sortBy('tahun')->values()->all();
+        $tidakbersih = Penilaian_cs::select('pendapat_tentang_kebersihan')->where('pendapat_tentang_kebersihan', 'Tidak Bersih dan Tidak Nyaman')->orWhere('pendapat_tentang_kebersihan', 'a. Tidak Bersih dan Tidak Nyaman')->count();
+        $kurangbersih = Penilaian_cs::select('pendapat_tentang_kebersihan')->where('pendapat_tentang_kebersihan', 'Kurang Bersih dan Tidak Nyaman')->orWhere('pendapat_tentang_kebersihan', 'b. Kurang Bersih dan Tidak Nyaman')->count();
+        $bersih = Penilaian_cs::select('pendapat_tentang_kebersihan')->where('pendapat_tentang_kebersihan', 'Bersih dan Nyaman')->orWhere('pendapat_tentang_kebersihan', 'c. Bersih dan Nyaman')->count();
+        $sangatbersih = Penilaian_cs::select('pendapat_tentang_kebersihan')->where('pendapat_tentang_kebersihan', 'Sangat Bersih dan Sangat Nyaman')->orWhere('pendapat_tentang_kebersihan', 'd. Sangat Bersih dan Sangat nyaman')->orWhere('pendapat_tentang_kebersihan', 'd. Sangat Bersih dan Tidak nyaman')->count();
+        $tidakramahtidak = Penilaian_cs::select('pendapat_tentang_pelayanan_satpam')->where('pendapat_tentang_pelayanan_satpam', 'Tidak ramah dan Tidak sigap')->orWhere('pendapat_tentang_pelayanan_satpam', 'a. Tidak ramah dan Tidak sigap')->count();
+        $tidakramah = Penilaian_cs::select('pendapat_tentang_pelayanan_satpam')->where('pendapat_tentang_pelayanan_satpam', 'Tidak ramah tetapi sigap')->orWhere('pendapat_tentang_pelayanan_satpam', 'b. Tidak ramah tetapi sigap')->count();
+        $ramahtidak = Penilaian_cs::select('pendapat_tentang_pelayanan_satpam')->where('pendapat_tentang_pelayanan_satpam', 'Ramah tetapi tidak sigap')->orWhere('pendapat_tentang_pelayanan_satpam', 'c. Ramah tetapi tidak sigap')->count();
+        $ramah = Penilaian_cs::select('pendapat_tentang_pelayanan_satpam')->where('pendapat_tentang_pelayanan_satpam', 'Ramah dan sigap')->orWhere('pendapat_tentang_pelayanan_satpam', 'd. Ramah dan sigap')->count();
+        $ada = Penilaian_cs::select('diminta_uang_imbalan')->where('diminta_uang_imbalan', 'Ada')->orWhere('diminta_uang_imbalan', 'b. Ada')->count();
+        $tidak = Penilaian_cs::select('diminta_uang_imbalan')->where('diminta_uang_imbalan', 'Tidak ada')->orWhere('pendapat_tentang_pelayanan_satpam', 'a. Tidak ada')->count();
         // dd($kecepatantransaksi);
-        return view('dashboard', compact('ramah','jelas','kurangjelas','jelastidaktepat','tidakjelas', 'sangatramah', 'tidakramah', 'kurangramah', 'kecepatantransaksi'));
+        return view('dashboard', compact('ada','tidak','tidakramahtidak','tidakramah','ramahtidak','ramah','kecepatantransaksi','tidakbersih', 'kurangbersih', 'bersih', 'sangatbersih','ramah','jelas','kurangjelas','jelastidaktepat','tidakjelas', 'sangatramah', 'tidakramah', 'kurangramah', 'kecepatantransaksi'));
     }
 }

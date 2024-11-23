@@ -19,6 +19,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/penilaian-cs', [InputController::class, 'actioninputpenilaiancs']);
     Route::get('/penilaian-cs/create', [InputController::class, 'inputpenilaiancs']);
     Route::get('/penilaian-teller', [InputController::class, 'penilaianteller'])->name('input-penilaian-teller');
+    Route::post('/penilaian-teller', [InputController::class, 'actioninputpenilaianteller'])->name('input-penilaian-teller');
+    Route::get('/penilaian-teller/create', [InputController::class, 'inputpenilaianteller'])->name('input-penilaian-teller');
 });
 
 require __DIR__.'/auth.php';

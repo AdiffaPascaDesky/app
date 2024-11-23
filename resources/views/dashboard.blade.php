@@ -20,7 +20,8 @@
                             <canvas id="kecepatan"></canvas>
                         </div>
                         <div class=" col-span-3 p-4 bg-gray-100 rounded-xl">
-                            <p class="text-center font-semibold">Survey Penilaian Penjelasan yang Diberikan Customer Service
+                            <p class="text-center font-semibold">Survey Penilaian Penjelasan yang Diberikan Customer
+                                Service
                             </p>
                             <canvas id="penjelasan"></canvas>
                         </div>
@@ -88,51 +89,73 @@
             }
         })
         const penjelasan = document.getElementById('penjelasan');
-        new Chart(penjelasan,{
+        new Chart(penjelasan, {
             type: 'bar',
             data: {
-                labels: ['Jelas', 'Jelas Tetapi Kurang Tepat','Kurang Jelas', 'Tidak Jelas'],
+                labels: ['Jelas', 'Jelas Tetapi Kurang Tepat', 'Kurang Jelas', 'Tidak Jelas'],
                 datasets: [{
                     label: 'Jumlah',
-                    data: [{{$jelas}},{{$jelastidaktepat}},{{$kurangjelas}},{{$tidakjelas}}],
+                    data: [{{ $jelas }}, {{ $jelastidaktepat }}, {{ $kurangjelas }},
+                        {{ $tidakjelas }}
+                    ],
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)'
-                   ],
+                        'rgba(255, 99, 132)',
+                        'rgba(54, 162, 235)',
+                        'rgba(255, 206, 86)',
+                        'rgba(75, 192, 192)'
+                    ],
                     borderColor: [
                         'rgba(255, 99, 132, 1)',
                         'rgba(54, 162, 235, 1)',
                         'rgba(255, 206, 86, 1)',
                         'rgba(75, 192, 192, 1)'
                     ],
-                    borderWidth: 1
                 }]
             },
             options: {
                 indexAxis: 'y', // mengatur axis menjadi horizontal
                 scales: {
                     x: {
+                        ticks: {
+                            display: false,
+                        },
+                        gridLines:{
+                            display: false,
+                        },
+                        grid: {
+                            display: false,
+                        },
                         beginAtZero: true
+                    },
+                    y: { 
+                        gridLines:{
+                            display: false,
+                        },
+                        grid: {
+                            display: false,
+                        },
                     }
                 }
             }
         })
         const kebersihan = document.getElementById('kebersihan');
-        new Chart(kebersihan,{
+        new Chart(kebersihan, {
             type: 'pie',
             data: {
-                labels: ['Sangat Bersih dan Sangat nyaman', 'Bersih dan Nyaman','Kurang Bersih dan Tidak Nyaman', 'Tidak Bersih dan Tidak Nyaman'],
+                labels: ['Sangat Bersih dan Sangat nyaman', 'Bersih dan Nyaman', 'Kurang Bersih dan Tidak Nyaman',
+                    'Tidak Bersih dan Tidak Nyaman'
+                ],
                 datasets: [{
                     label: 'Jumlah',
-                    data: [{{$sangatbersih}},{{$bersih}},{{$kurangbersih}},{{$tidakbersih}}],
+                    data: [{{ $sangatbersih }}, {{ $bersih }}, {{ $kurangbersih }},
+                        {{ $tidakbersih }}
+                    ],
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)'
-                   ],
+                        'rgba(255, 99, 132)',
+                        'rgba(54, 162, 235)',
+                        'rgba(255, 206, 86)',
+                        'rgba(75, 192, 192)'
+                    ],
                     borderColor: [
                         'rgba(255, 99, 132, 1)',
                         'rgba(54, 162, 235, 1)',
@@ -146,25 +169,37 @@
                 indexAxis: 'y', // mengatur axis menjadi horizontal
                 scales: {
                     x: {
-                        beginAtZero: true
+                        display: false
+                    },
+                    y: {
+                        display: false, 
                     }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    } 
                 }
             }
         })
         const satpam = document.getElementById('satpam');
-        new Chart(satpam,{
+        new Chart(satpam, {
             type: 'doughnut',
             data: {
-                labels: ['Ramah dan Sigap', 'Ramah Tetapi Tidak Sigak','Tidak Ramah Tetapi Sigap', 'Tidak Ramah dan Tidak Sigap'],
+                labels: ['Ramah dan Sigap', 'Ramah Tetapi Tidak Sigak', 'Tidak Ramah Tetapi Sigap',
+                    'Tidak Ramah dan Tidak Sigap'
+                ],
                 datasets: [{
                     label: 'Jumlah',
-                    data: [{{$ramah}},{{$ramahtidak}},{{$tidakramah}},{{$tidakramahtidak}}],
+                    data: [{{ $ramah }}, {{ $ramahtidak }}, {{ $tidakramah }},
+                        {{ $tidakramahtidak }}
+                    ],
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)'
-                   ],
+                        'rgba(255, 99, 132)',
+                        'rgba(54, 162, 235)',
+                        'rgba(255, 206, 86)',
+                        'rgba(75, 192, 192)'
+                    ],
                     borderColor: [
                         'rgba(255, 99, 132, 1)',
                         'rgba(54, 162, 235, 1)',
@@ -178,25 +213,28 @@
                 indexAxis: 'y', // mengatur axis menjadi horizontal
                 scales: {
                     x: {
+                        display: false,
                         beginAtZero: true
+                    },
+                    y: {
+                        display: false,
                     }
                 }
             }
         })
         const imbalan = document.getElementById('imbalan');
-        new Chart(imbalan,{
+        new Chart(imbalan, {
             type: 'pie',
             data: {
                 labels: ['Ada', 'Tidak Ada'],
                 datasets: [{
                     label: 'Jumlah',
-                    data: [{{$ada}},{{$tidak}}],
+                    data: [{{ $ada }}, {{ $tidak }}],
                     backgroundColor: [
                         'rgba(213, 180, 19, 1)',
                         'rgba(230, 67, 87, 1)'
-                   ],
-                    borderColor: [ 
                     ],
+                    borderColor: [],
                     borderWidth: 1
                 }]
             },
@@ -204,7 +242,11 @@
                 indexAxis: 'y', // mengatur axis menjadi horizontal
                 scales: {
                     x: {
+                        display: false,
                         beginAtZero: true
+                    },
+                    y: {
+                        display: false,
                     }
                 }
             }

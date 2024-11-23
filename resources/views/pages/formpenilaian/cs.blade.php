@@ -31,37 +31,38 @@
                                     <tr>
                                         <!-- Show only selected display columns -->
                                         @foreach ($displayColumns as $column)
-                                            @if (request()->has('display_columns') && in_array($column, request('display_columns')))
+                                            @if (request('display_columns') === null)
                                                 <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
                                                     {{ ucwords(str_replace('_', ' ', $column)) }}
                                                 </th>
+                                            @else
+                                                @if (request()->has('display_columns') && in_array($column, request('display_columns')))
+                                                    <th scope="col"
+                                                        class="px-6 py-3 whitespace-nowrap dark:text-white">
+                                                        {{ ucwords(str_replace('_', ' ', $column)) }}
+                                                    </th>
+                                                @endif
                                             @endif
-                                        @endforeach
-                                        @foreach ($filterColumns as $column)
-                                            @if (request()->has('display_columns') && in_array($column, request('display_columns')))
-                                                <th scope="col" class="px-6 py-3 whitespace-nowrap dark:text-white">
-                                                    {{ ucwords(str_replace('_', ' ', $column)) }}
-                                                </th>
-                                            @endif
-                                        @endforeach
+                                        @endforeach 
                                     </tr>
                                     {{-- @endforeach  --}}
                                 </thead>
-                                <tbody>
-
+                                <tbody> 
                                     @foreach ($penilaian as $row)
                                         <tr>
+                                            @php
+                                                // dd(request('display_columns'));
+                                            @endphp
                                             <!-- Show only selected display columns -->
                                             @foreach ($displayColumns as $column)
-                                                @if (request()->has('display_columns') && in_array($column, request('display_columns')))
+                                                @if (request('display_columns') === null)
                                                     <td class=" px-4 py-2">{{ $row->$column }}</td>
+                                                @else
+                                                    @if (request()->has('display_columns') && in_array($column, request('display_columns')))
+                                                        <td class=" px-4 py-2">{{ $row->$column }}</td>
+                                                    @endif
                                                 @endif
-                                            @endforeach
-                                            @foreach ($filterColumns as $column)
-                                                @if (request()->has('display_columns') && in_array($column, request('display_columns')))
-                                                    <td class=" px-4 py-2">{{ $row->$column }}</td>
-                                                @endif
-                                            @endforeach
+                                            @endforeach 
                                         </tr>
                                     @endforeach
                                 </tbody>

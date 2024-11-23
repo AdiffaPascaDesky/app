@@ -13,19 +13,19 @@ return new class extends Migration
     {
         Schema::create('penilaian_tellers', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_unit');
-            $table->string('nama_nasabah');
-            $table->string('nomor_telepon');
-            $table->string('pendapat_tentang_pelayanan_teler');
-            $table->string('pendapat_tentang_kecepatan_transaksi_teler');
-            $table->string('nama_petugas_teler');
-            $table->string('pendapat_kebersihan_dan_kenyamanan_tempat');
-            $table->string('pendapat_tentang_pelayanan_satpam_mengarahkan_untuk_transaksi');
-            $table->string('nama_satpam');
-            $table->string('apakah_diminta_imbalan');
-            $table->string('nama_pegawai_yang_meminta');
-            $table->string('saran_perbaikan');
-            $table->string('email');
+            $table->string('nama_unit')->nullable();
+            $table->string('nama_nasabah')->nullable();
+            $table->string('nomor_telepon')->nullable();
+            $table->text('pendapat_tentang_pelayanan_teler')->nullable();
+            $table->text('pendapat_tentang_kecepatan_transaksi_teler')->nullable();
+            $table->text('nama_petugas_teler')->nullable();
+            $table->text('pendapat_kebersihan_dan_kenyamanan_tempat')->nullable();
+            $table->text('pendapat_tentang_pelayanan_satpam_mengarahkan_untuk_transaksi')->nullable();
+            $table->text('nama_satpam')->nullable();
+            $table->text('apakah_diminta_imbalan')->nullable();
+            $table->text('nama_pegawai_yang_meminta')->nullable();
+            $table->text('saran_perbaikan')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
         });
     }

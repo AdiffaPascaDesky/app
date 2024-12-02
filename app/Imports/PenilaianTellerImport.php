@@ -10,11 +10,11 @@ use Carbon\Carbon;
 class PenilaianTellerImport implements ToModel, WithHeadingRow
 {
     /**
-    * @param Collection $collection
-    */
+     * @param Collection $collection
+     */
     public function model(array $row)
     {
-        // dd($row);
+        // dd($this->convertTimestamp($row['timestamp']));
         if (
             is_null($row['nama_unit_kantor_bank_sumut']) &&
             is_null($row['nama_nasabah']) &&
@@ -48,22 +48,30 @@ class PenilaianTellerImport implements ToModel, WithHeadingRow
             'email' => $row['email_address'],
             'created_at' => $this->convertTimestamp($row['timestamp']),
         ]);
-        
+
     }
     private function convertTimestamp($timestamp)
     {
         try {
             if (is_numeric($timestamp)) {
-                // Tambahkan jumlah hari dari basis waktu Excel (1 Januari 1900)
-                return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($timestamp));
-            } else {
-                // Jika bukan angka, maka coba parsing sebagai tanggal biasa
-                return Carbon::createFromFormat('d/m/Y H:i:s', $timestamp);
+                // Jika timestamp berupa angka, gunakan konversi dari PhpSpreadsheet
+                return Carbon::instance(
+                    \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($timestamp)
+                );
+            } elseif (is_string($timestamp)) {
+                // Jika timestamp berupa string, coba beberapa format umum
+                $formats = ['d/m/Y H:i:s', 'Y-m-d H:i:s', 'd/m/Y', 'Y-m-d'];
+                foreach ($formats as $format) {
+                    $date = Carbon::createFromFormat($format, $timestamp, 'UTC');
+                    if ($date !== false) {
+                        return $date;
+                    }
+                }
             }
         } catch (\Exception $e) {
             // Jika gagal, kembalikan null atau tangani sesuai kebutuhan
             return now();
         }
     }
-    
+
 }

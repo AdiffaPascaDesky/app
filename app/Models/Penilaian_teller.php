@@ -22,5 +22,7 @@ class Penilaian_teller extends Model
         'nama_pegawai_yang_meminta',
         'saran_perbaikan',
         'email',
+        'created_at',
+
     ];
 }

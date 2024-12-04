@@ -12,87 +12,360 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         // dd($request['filter'] === null);
-        $ada = '';
-        $tidak = '';
-        $tidakramahtidak = '';
-        $tidakramah = '';
-        $ramahtidak = '';
-        $ramah = '';
-        $kecepatantransaksi = '';
-        $tidakbersih = '';
-        $kurangbersih = '';
-        $bersih = '';
-        $sangatbersih = '';
-        $jelas = '';
-        $kurangjelas = '';
-        $jelastidaktepat = '';
-        $tidakjelas = '';
-        $sangatramah = '';
-        $kurangramah = '';
+        $pendapatcs = '';
+        $kecepatancs = '';
+        $penjelasancs = '';
+        $kebersihancs = '';
+        $satpamcs = '';
+        $imbalancs = ''; 
         if (($request['filter'] === 'cs' && $request['filter'] !== 'teller') || $request['filter'] === null) {
-            $ramah = Penilaian_cs::select('pendapat_tentang_pelayanan_yang_diberikan')->where('pendapat_tentang_pelayanan_yang_diberikan', 'Ramah')->orWhere('pendapat_tentang_pelayanan_yang_diberikan', 'c. Ramah')->count();
-            $sangatramah = Penilaian_cs::select('pendapat_tentang_pelayanan_yang_diberikan')->where('pendapat_tentang_pelayanan_yang_diberikan', 'Sangat Ramah')->orWhere('pendapat_tentang_pelayanan_yang_diberikan', 'd. Sangat Ramah')->count();
-            $tidakramah = Penilaian_cs::select('pendapat_tentang_pelayanan_yang_diberikan')->where('pendapat_tentang_pelayanan_yang_diberikan', 'Tidak Ramah')->orWhere('pendapat_tentang_pelayanan_yang_diberikan', 'a. Tidak Ramah')->count();
-            $kurangramah = Penilaian_cs::select('pendapat_tentang_pelayanan_yang_diberikan')->where('pendapat_tentang_pelayanan_yang_diberikan', 'Kurang Ramah')->orWhere('pendapat_tentang_pelayanan_yang_diberikan', 'b. Kurang Ramah')->count();
-            $jelas = Penilaian_cs::select('pendapat_tentang_penjelasan_yang_diberikan')->where('pendapat_tentang_penjelasan_yang_diberikan', 'Jelas dan tepat')->orWhere('pendapat_tentang_penjelasan_yang_diberikan', 'd. Jelas dan tepat')->count();
-            $kurangjelas = Penilaian_cs::select('pendapat_tentang_penjelasan_yang_diberikan')->where('pendapat_tentang_penjelasan_yang_diberikan', 'Kurang jelas')->orWhere('pendapat_tentang_penjelasan_yang_diberikan', 'b. Kurang jelas')->count();
-            $jelastidaktepat = Penilaian_cs::select('pendapat_tentang_penjelasan_yang_diberikan')->where('pendapat_tentang_penjelasan_yang_diberikan', 'Jelas tetapi kurang tepat')->orWhere('pendapat_tentang_penjelasan_yang_diberikan', 'c. Jelas tetapi kurang tepat')->count();
-            $tidakjelas = Penilaian_cs::select('pendapat_tentang_penjelasan_yang_diberikan')->where('pendapat_tentang_penjelasan_yang_diberikan', 'Tidak jelas')->orWhere('pendapat_tentang_penjelasan_yang_diberikan', 'a. Tidak jelas')->count();
-
             $years = Penilaian_cs::selectRaw('YEAR(created_at) as tahun')
                 ->distinct()
                 ->orderBy('tahun') // Mengurutkan tahun sejak awal pengambilan data
                 ->pluck('tahun');
 
-            // Kategori default
             $defaultCategories = [
-                'Sangat Lambat',
-                'Lambat',
-                'Cepat'
+                'Sangat Ramah',
+                'Ramah',
+                'Kurang ramah',
+                'Tidak ramah'
             ];
-
-            // Query untuk menghitung jumlah setiap kategori per tahun
-            $data = Penilaian_cs::select(
-                DB::raw('YEAR(created_at) as tahun'),
+            $pendapatcs = Penilaian_cs::select(
                 DB::raw("CASE
-            WHEN LOWER(pendapat_tentang_kecepatan_transaksi) LIKE '%sangat lambat%' THEN 'Sangat Lambat'
-            WHEN LOWER(pendapat_tentang_kecepatan_transaksi) LIKE '%lambat%' THEN 'Lambat'
-            WHEN LOWER(pendapat_tentang_kecepatan_transaksi) LIKE '%cepat%' THEN 'Cepat'
-            ELSE pendapat_tentang_kecepatan_transaksi
-        END as kecepatan"),
+        WHEN LOWER(pendapat_tentang_pelayanan_yang_diberikan) LIKE '%sangat ramah%' THEN 'Sangat ramah'
+        WHEN LOWER(pendapat_tentang_pelayanan_yang_diberikan) LIKE '%ramah%' THEN 'Ramah'
+        WHEN LOWER(pendapat_tentang_pelayanan_yang_diberikan) LIKE '%Kurang ramah%' THEN 'Kurang ramah'
+        WHEN LOWER(pendapat_tentang_pelayanan_yang_diberikan) LIKE '%tidak ramah%' THEN 'Tidak ramah'
+        ELSE pendapat_tentang_pelayanan_yang_diberikan
+    END as kecepatan"),
                 DB::raw('COUNT(*) as jumlah')
-            )
-                ->groupBy('tahun', 'kecepatan')
-                ->get();
+            );
+            // dd($pendapatcs);
+            if ($request['tampilan'] === 'tahun') {
+                $pendapatcs->addSelect(DB::raw('YEAR(created_at) as tahun'));
+            }
+            $pendapatcs->whereNot('created_at', null)
+                ->whereNot('pendapat_tentang_pelayanan_yang_diberikan', null);
+            if ($request['tampilan'] === 'tahun') {
+                $pendapatcs->groupBy('tahun', 'kecepatan');
+            } else {
+                $pendapatcs->groupBy('kecepatan');
 
-            // Atur data dalam format yang diinginkan
-            $result = [];
-            foreach ($years as $year) {
-                foreach ($defaultCategories as $category) {
-                    $filtered = $data->first(function ($item) use ($year, $category) {
-                        return $item->tahun == $year && $item->kecepatan == $category;
-                    });
+            }
+            $pendapatcs = $pendapatcs->get();
+            $groupedData = [];
+            if ($request['tampilan'] === 'tahun') {
 
-                    // Jika data ditemukan, ambil jumlahnya; jika tidak, setel ke 0
-                    $result[] = [
-                        'tahun' => $year,
-                        'kecepatan' => $category,
-                        'jumlah' => $filtered ? $filtered->jumlah : 0
-                    ];
+                foreach ($pendapatcs as $item) {
+                    if (!isset($groupedData[$item->tahun])) {
+                        $groupedData[$item->tahun] = [];
+                    }
+                    $groupedData[$item->tahun][$item->kecepatan] = $item->jumlah;
+                }
+                $result = [];
+                foreach ($years as $year) {
+                    $yearData = ['tahun' => $year, 'data' => []];
+                    foreach ($defaultCategories as $category) {
+                        $yearData['data'][] = [
+                            'kecepatan' => $category,
+                            'jumlah' => isset($groupedData[$year][$category]) ? $groupedData[$year][$category] : 0
+                        ];
+                    }
+                    $result[] = $yearData;
                 }
             }
-            $kecepatantransaksi = collect($result)->sortBy('tahun')->values()->all();
-            $tidakbersih = Penilaian_cs::select('pendapat_tentang_kebersihan')->where('pendapat_tentang_kebersihan', 'Tidak Bersih dan Tidak Nyaman')->orWhere('pendapat_tentang_kebersihan', 'a. Tidak Bersih dan Tidak Nyaman')->count();
-            $kurangbersih = Penilaian_cs::select('pendapat_tentang_kebersihan')->where('pendapat_tentang_kebersihan', 'Kurang Bersih dan Tidak Nyaman')->orWhere('pendapat_tentang_kebersihan', 'b. Kurang Bersih dan Tidak Nyaman')->count();
-            $bersih = Penilaian_cs::select('pendapat_tentang_kebersihan')->where('pendapat_tentang_kebersihan', 'Bersih dan Nyaman')->orWhere('pendapat_tentang_kebersihan', 'c. Bersih dan Nyaman')->count();
-            $sangatbersih = Penilaian_cs::select('pendapat_tentang_kebersihan')->where('pendapat_tentang_kebersihan', 'Sangat Bersih dan Sangat Nyaman')->orWhere('pendapat_tentang_kebersihan', 'd. Sangat Bersih dan Sangat nyaman')->orWhere('pendapat_tentang_kebersihan', 'd. Sangat Bersih dan Tidak nyaman')->count();
-            $tidakramahtidak = Penilaian_cs::select('pendapat_tentang_pelayanan_satpam')->where('pendapat_tentang_pelayanan_satpam', 'Tidak ramah dan Tidak sigap')->orWhere('pendapat_tentang_pelayanan_satpam', 'a. Tidak ramah dan Tidak sigap')->count();
-            $tidakramah = Penilaian_cs::select('pendapat_tentang_pelayanan_satpam')->where('pendapat_tentang_pelayanan_satpam', 'Tidak ramah tetapi sigap')->orWhere('pendapat_tentang_pelayanan_satpam', 'b. Tidak ramah tetapi sigap')->count();
-            $ramahtidak = Penilaian_cs::select('pendapat_tentang_pelayanan_satpam')->where('pendapat_tentang_pelayanan_satpam', 'Ramah tetapi tidak sigap')->orWhere('pendapat_tentang_pelayanan_satpam', 'c. Ramah tetapi tidak sigap')->count();
-            $ramah = Penilaian_cs::select('pendapat_tentang_pelayanan_satpam')->where('pendapat_tentang_pelayanan_satpam', 'Ramah dan sigap')->orWhere('pendapat_tentang_pelayanan_satpam', 'd. Ramah dan sigap')->count();
-            $ada = Penilaian_cs::select('diminta_uang_imbalan')->where('diminta_uang_imbalan', 'Ada')->orWhere('diminta_uang_imbalan', 'b. Ada')->count();
-            $tidak = Penilaian_cs::select('diminta_uang_imbalan')->where('diminta_uang_imbalan', 'Tidak ada')->orWhere('pendapat_tentang_pelayanan_satpam', 'a. Tidak ada')->count();
-        }
+
+            // Hasil akhir yang sudah dikelompokkan
+            // dd($pendapatcs);
+            if ($request['tampilan'] === 'tahun') {
+                # code...
+                $pendapatcs = collect($result)->sortBy('tahun')->values()->all();
+            } else {
+                // $pendapatcs = $pendapatcs->groupBy('kecepatan');
+                $pendapatcs = $pendapatcs->toArray();
+            }
+            $defaultCategories = [
+                'Sangat Cepat',
+                'Cepat',
+                'Lambat',
+                'Sangat lambat',
+            ];
+            $kecepatancs = Penilaian_cs::select(
+                DB::raw("CASE
+                WHEN LOWER(pendapat_tentang_kecepatan_transaksi) LIKE '%sangat cepat%' THEN 'Sangat Cepat'
+                WHEN LOWER(pendapat_tentang_kecepatan_transaksi) LIKE '%cepat%' THEN 'Cepat'
+                WHEN LOWER(pendapat_tentang_kecepatan_transaksi) LIKE '%lambat%' THEN 'Lambat'
+                WHEN LOWER(pendapat_tentang_kecepatan_transaksi) LIKE '%sangat lambat%' THEN 'Sangat lambat'
+                ELSE pendapat_tentang_kecepatan_transaksi
+                END as kecepatan"),
+                DB::raw('COUNT(*) as jumlah')
+            );
+            if ($request['tampilan'] === 'tahun') {
+                $kecepatancs->addSelect(DB::raw('YEAR(created_at) as tahun'));
+            }
+            $kecepatancs->whereNot('created_at', null)
+                ->whereNot('pendapat_tentang_kecepatan_transaksi', null);
+            if ($request['tampilan'] === 'tahun') {
+                $kecepatancs->groupBy('tahun', 'kecepatan');
+            } else {
+                $kecepatancs->groupBy('kecepatan');
+
+            }
+            $kecepatancs = $kecepatancs->get();
+            $groupedData = [];
+            if ($request['tampilan'] === 'tahun') {
+
+                foreach ($kecepatancs as $item) {
+                    if (!isset($groupedData[$item->tahun])) {
+                        $groupedData[$item->tahun] = [];
+                    }
+                    $groupedData[$item->tahun][$item->kecepatan] = $item->jumlah;
+                }
+                $result = [];
+                foreach ($years as $year) {
+                    $yearData = ['tahun' => $year, 'data' => []];
+                    foreach ($defaultCategories as $category) {
+                        $yearData['data'][] = [
+                            'kecepatan' => $category,
+                            'jumlah' => isset($groupedData[$year][$category]) ? $groupedData[$year][$category] : 0
+                        ];
+                    }
+                    $result[] = $yearData;
+                }
+            }
+            if ($request['tampilan'] === 'tahun') {
+                # code...
+                $kecepatancs = collect($result)->sortBy('tahun')->values()->all();
+            } else {
+                // $pendapatcs = $pendapatcs->groupBy('kecepatan');
+                $kecepatancs = $kecepatancs->toArray();
+            }
+            // Hasil akhir yang sudah dikelompokkan
+            // dd($kecepatancs); 
+            $defaultCategories = [
+                'Jelas dan tepat',
+                'Jelas tetapi kurang tepat',
+                'Jelas tetapi berbelit belit',
+                'Jelas tetapi kurang tepat',
+                'Tidak jelas',
+            ];
+            $penjelasancs = Penilaian_cs::select(
+                DB::raw("CASE
+                WHEN LOWER(pendapat_tentang_penjelasan_yang_diberikan) LIKE '%jelas dan tepat%' THEN 'Jelas dan tepat'
+                WHEN LOWER(pendapat_tentang_penjelasan_yang_diberikan) LIKE '%jelas tetapi kurang tepat%' THEN 'Jelas tetapi kurang tepat'
+                WHEN LOWER(pendapat_tentang_penjelasan_yang_diberikan) LIKE '%jelas tetapi berbelit belit%' THEN 'Jelas tetapi berbelit belit'
+                WHEN LOWER(pendapat_tentang_penjelasan_yang_diberikan) LIKE '%tidak jelas%' THEN 'Tidak jelas'
+                ELSE pendapat_tentang_penjelasan_yang_diberikan
+                END as kecepatan"),
+                DB::raw('COUNT(*) as jumlah')
+            );
+            if ($request['tampilan'] === 'tahun') {
+                $penjelasancs->addSelect(DB::raw('YEAR(created_at) as tahun'));
+            }
+            $penjelasancs->whereNot('created_at', null)
+                ->whereNot('pendapat_tentang_penjelasan_yang_diberikan', null);
+            if ($request['tampilan'] === 'tahun') {
+                $penjelasancs->groupBy('tahun', 'kecepatan');
+            } else {
+                $penjelasancs->groupBy('kecepatan');
+
+            }
+            $penjelasancs = $penjelasancs->get();
+            $groupedData = [];
+            if ($request['tampilan'] === 'tahun') {
+
+                foreach ($penjelasancs as $item) {
+                    if (!isset($groupedData[$item->tahun])) {
+                        $groupedData[$item->tahun] = [];
+                    }
+                    $groupedData[$item->tahun][$item->kecepatan] = $item->jumlah;
+                }
+                $result = [];
+                foreach ($years as $year) {
+                    $yearData = ['tahun' => $year, 'data' => []];
+                    foreach ($defaultCategories as $category) {
+                        $yearData['data'][] = [
+                            'kecepatan' => $category,
+                            'jumlah' => isset($groupedData[$year][$category]) ? $groupedData[$year][$category] : 0
+                        ];
+                    }
+                    $result[] = $yearData;
+                }
+            }
+            if ($request['tampilan'] === 'tahun') {
+                # code...
+                $penjelasancs = collect($result)->sortBy('tahun')->values()->all();
+            } else {
+                // $penjelasancs = $penjelasancs->groupBy('kecepatan');
+                $penjelasancs = $penjelasancs->toArray();
+            }
+            $defaultCategories = [
+                'Sangat bersih dan Sangat nyaman',
+                'Bersih dan Nyaman',
+                'Bersih tetapi kurang nyaman',
+                'Kurang bersih dan Tidak nyaman',
+            ];
+            $kebersihancs = Penilaian_cs::select(
+                DB::raw("CASE
+                WHEN LOWER(pendapat_tentang_kebersihan) LIKE '%sangat bersih dan sangat nyaman%' THEN 'Sangat bersih dan Sangat nyaman'
+                WHEN LOWER(pendapat_tentang_kebersihan) LIKE '%bersih dan nyaman%' THEN 'Bersih dan Nyaman'
+                WHEN LOWER(pendapat_tentang_kebersihan) LIKE '%bersih tetapi kurang nyaman%' THEN 'Bersih tetapi kurang nyaman'
+                WHEN LOWER(pendapat_tentang_kebersihan) LIKE '%kurang bersih dan tidak nyaman%' THEN 'Kurang bersih dan Tidak nyaman'
+                ELSE pendapat_tentang_kebersihan
+                END as kecepatan"),
+                DB::raw('COUNT(*) as jumlah')
+            );
+            if ($request['tampilan'] === 'tahun') {
+                $kebersihancs->addSelect(DB::raw('YEAR(created_at) as tahun'));
+            }
+            $kebersihancs->whereNot('created_at', null)
+                ->whereNot('pendapat_tentang_kebersihan', null);
+            if ($request['tampilan'] === 'tahun') {
+                $kebersihancs->groupBy('tahun', 'kecepatan');
+            } else {
+                $kebersihancs->groupBy('kecepatan');
+
+            }
+            $kebersihancs = $kebersihancs->get();
+            $groupedData = [];
+            if ($request['tampilan'] === 'tahun') {
+
+                foreach ($kebersihancs as $item) {
+                    if (!isset($groupedData[$item->tahun])) {
+                        $groupedData[$item->tahun] = [];
+                    }
+                    $groupedData[$item->tahun][$item->kecepatan] = $item->jumlah;
+                }
+                $result = [];
+                foreach ($years as $year) {
+                    $yearData = ['tahun' => $year, 'data' => []];
+                    foreach ($defaultCategories as $category) {
+                        $yearData['data'][] = [
+                            'kecepatan' => $category,
+                            'jumlah' => isset($groupedData[$year][$category]) ? $groupedData[$year][$category] : 0
+                        ];
+                    }
+                    $result[] = $yearData;
+                }
+            }
+            if ($request['tampilan'] === 'tahun') {
+                # code...
+                $kebersihancs = collect($result)->sortBy('tahun')->values()->all();
+            } else {
+                // $kebersihancs = $kebersihancs->groupBy('kecepatan');
+                $kebersihancs = $kebersihancs->toArray();
+            }
+            $defaultCategories = [
+                'Ramah dan Sigap',
+                'Ramah tetapi tidak sigap',
+                'Tidak ramah tetapi sigap',
+                'Tidak ramah dan Tidak sigap',
+            ];
+            $satpamcs = Penilaian_cs::select(
+                DB::raw("CASE
+                WHEN LOWER(pendapat_tentang_pelayanan_satpam) LIKE '%ramah dan sigap%' THEN 'Ramah dan Sigap'
+                WHEN LOWER(pendapat_tentang_pelayanan_satpam) LIKE '%ramah tetapi tidak sigap%' THEN 'Ramah tetapi tidak sigap'
+                WHEN LOWER(pendapat_tentang_pelayanan_satpam) LIKE '%tidak ramah tetapi sigap%' THEN 'Tidak ramah tetapi Sigap'
+                WHEN LOWER(pendapat_tentang_pelayanan_satpam) LIKE '%tidak ramah dan tidak sigap%' THEN 'Tidak ramah dan Tidak sigap'
+                ELSE pendapat_tentang_pelayanan_satpam
+                END as kecepatan"),
+                DB::raw('COUNT(*) as jumlah')
+            );
+            if ($request['tampilan'] === 'tahun') {
+                $satpamcs->addSelect(DB::raw('YEAR(created_at) as tahun'));
+            }
+            $satpamcs->whereNot('created_at', null)
+                ->whereNot('pendapat_tentang_pelayanan_satpam', null);
+            if ($request['tampilan'] === 'tahun') {
+                $satpamcs->groupBy('tahun', 'kecepatan');
+            } else {
+                $satpamcs->groupBy('kecepatan');
+
+            }
+            $satpamcs = $satpamcs->get();
+            $groupedData = [];
+            if ($request['tampilan'] === 'tahun') {
+
+                foreach ($satpamcs as $item) {
+                    if (!isset($groupedData[$item->tahun])) {
+                        $groupedData[$item->tahun] = [];
+                    }
+                    $groupedData[$item->tahun][$item->kecepatan] = $item->jumlah;
+                }
+                $result = [];
+                foreach ($years as $year) {
+                    $yearData = ['tahun' => $year, 'data' => []];
+                    foreach ($defaultCategories as $category) {
+                        $yearData['data'][] = [
+                            'kecepatan' => $category,
+                            'jumlah' => isset($groupedData[$year][$category]) ? $groupedData[$year][$category] : 0
+                        ];
+                    }
+                    $result[] = $yearData;
+                }
+            }
+            if ($request['tampilan'] === 'tahun') {
+                # code...
+                $satpamcs = collect($result)->sortBy('tahun')->values()->all();
+            } else {
+                // $satpamcs = $satpamcs->groupBy('kecepatan');
+                $satpamcs = $satpamcs->toArray();
+            }
+            $defaultCategories = [
+                'Ada',
+                'Tidak ada',
+            ];
+            $imbalancs = Penilaian_cs::select(
+                DB::raw("CASE
+                WHEN LOWER(diminta_uang_imbalan) LIKE '%ada%' THEN 'Ada'
+                WHEN LOWER(diminta_uang_imbalan) LIKE '%tidak ada%' THEN 'Tidak ada' 
+                ELSE diminta_uang_imbalan
+                END as kecepatan"),
+                DB::raw('COUNT(*) as jumlah')
+            );
+            if ($request['tampilan'] === 'tahun') {
+                $imbalancs->addSelect(DB::raw('YEAR(created_at) as tahun'));
+            }
+            $imbalancs->whereNot('created_at', null)
+                ->whereNot('diminta_uang_imbalan', null);
+            if ($request['tampilan'] === 'tahun') {
+                $imbalancs->groupBy('tahun', 'kecepatan');
+            } else {
+                $imbalancs->groupBy('kecepatan');
+
+            }
+            $imbalancs = $imbalancs->get();
+            $groupedData = [];
+            if ($request['tampilan'] === 'tahun') {
+
+                foreach ($imbalancs as $item) {
+                    if (!isset($groupedData[$item->tahun])) {
+                        $groupedData[$item->tahun] = [];
+                    }
+                    $groupedData[$item->tahun][$item->kecepatan] = $item->jumlah;
+                }
+                $result = [];
+                foreach ($years as $year) {
+                    $yearData = ['tahun' => $year, 'data' => []];
+                    foreach ($defaultCategories as $category) {
+                        $yearData['data'][] = [
+                            'kecepatan' => $category,
+                            'jumlah' => isset($groupedData[$year][$category]) ? $groupedData[$year][$category] : 0
+                        ];
+                    }
+                    $result[] = $yearData;
+                }
+            }
+            if ($request['tampilan'] === 'tahun') {
+                # code...
+                $imbalancs = collect($result)->sortBy('tahun')->values()->all();
+            } else {
+                // $imbalancs = $imbalancs->groupBy('kecepatan');
+                $imbalancs = $imbalancs->toArray();
+            }
+            // dd($imbalancs);
+            // Kategori default
+             }
 
         // dd($kecepatantransaksi);
         // penilaiann teller
@@ -141,8 +414,8 @@ class DashboardController extends Controller
             }
             $pelayananteller = $pelayananteller->get();
             $result = [];
-            
-            if ($request['tampilan']=== 'tahun') {
+
+            if ($request['tampilan'] === 'tahun') {
 
                 foreach ($pelayananteller as $item) {
                     if (!isset($groupedData[$item->tahun])) {
@@ -395,6 +668,6 @@ class DashboardController extends Controller
         }
 
         // dd($dimintaimbalan);
-        return view('dashboard', compact('request', 'dimintaimbalan', 'pendapatpelayansatpam', 'kebersihantempat', 'kecepatanteller', 'pelayananteller', 'ada', 'tidak', 'tidakramahtidak', 'tidakramah', 'ramahtidak', 'ramah', 'kecepatantransaksi', 'tidakbersih', 'kurangbersih', 'bersih', 'sangatbersih', 'ramah', 'jelas', 'kurangjelas', 'jelastidaktepat', 'tidakjelas', 'sangatramah', 'tidakramah', 'kurangramah', 'kecepatantransaksi'));
+        return view('dashboard', compact('request', 'dimintaimbalan', 'pendapatpelayansatpam', 'kebersihantempat', 'kecepatanteller', 'pelayananteller', 'pendapatcs', 'kecepatancs', 'penjelasancs', 'kebersihancs', 'satpamcs', 'imbalancs'));
     }
 }
